@@ -14,7 +14,7 @@
     # Output schema from https://nixos.wiki/wiki/Flakes
     flake-utils.lib.eachDefaultSystem (system:
       let 
-        pname = "template";
+        pname = "bint";
         version = "0.1.0";
         pkgs = nixpkgs.legacyPackages.${system}; # legacyPackages is a workaround for using packages from ol' nixpkgs
       in
@@ -39,9 +39,17 @@
 
         # called when `nix develop` is invoked
         devShells.default = pkgs.mkShell {
-
-          # use nightly cargo & rustc provided by fenix. Add for packages for the dev shell here
-          buildInputs = with fenix.packages.${system}.minimal; [ cargo rustc ]; 
+          buildInputs = [
+            # use nightly cargo & rustc provided by fenix. Add for packages for the dev shell here
+            (fenix.packages.${system}.complete.withComponents [ 
+              "cargo"
+              "clippy"
+              "rust-src"
+              "rustc"
+              "rustfmt"
+            ])
+            pkgs.rust-analyzer
+          ];
         };
       }
     );
